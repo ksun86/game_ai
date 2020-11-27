@@ -61,6 +61,7 @@ SCARED_COLOR = formatColor(1,1,1)
 GHOST_VEC_COLORS = map(colorToVector, GHOST_COLORS)
 
 PACMAN_COLOR = formatColor(255.0/255.0,255.0/255.0,61.0/255)
+PACMAN_COLOR2 = formatColor(255.0/255.0,0.0/255.0,255.0/255)
 PACMAN_SCALE = 0.5
 #pacman_speed = 0.25
 
@@ -161,6 +162,7 @@ class PacmanGraphics:
         self.gridSize = DEFAULT_GRID_SIZE * zoom
         self.capture = capture
         self.frameTime = frameTime
+        self.isGodMode = False
 
     def checkNullDisplay(self):
         return False
@@ -273,10 +275,16 @@ class PacmanGraphics:
         outlineColor = PACMAN_COLOR
         fillColor = PACMAN_COLOR
 
+        if self.isGodMode:
+            outlineColor = PACMAN_COLOR2
+            fillColor = PACMAN_COLOR2
+
         if self.capture:
             outlineColor = TEAM_COLORS[index % 2]
             fillColor = GHOST_COLORS[index]
             width = PACMAN_CAPTURE_OUTLINE_WIDTH
+
+
 
         return [circle(screen_point, PACMAN_SCALE * self.gridSize,
                        fillColor = fillColor, outlineColor = outlineColor,
@@ -312,6 +320,8 @@ class PacmanGraphics:
             keys = wait_for_keys()
             if 'q' in keys:
                 self.frameTime = 0.1
+        if self.isGodMode:
+            changeColor(image, PACMAN_COLOR2)
         if self.frameTime > 0.01 or self.frameTime < 0:
             start = time.time()
             fx, fy = self.getPosition(prevPacman)
@@ -589,6 +599,7 @@ class PacmanGraphics:
     def updateDistributions(self, distributions):
         "Draws an agent's belief distributions"
         # copy all distributions so we don't change their state
+        print "distributions: " + distributions
         distributions = map(lambda x: x.copy(), distributions)
         if self.distributionImages == None:
             self.drawDistributions(self.previousState)

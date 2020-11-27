@@ -625,7 +625,7 @@ class Game:
         while not self.gameOver:
             print "Count: " + str(count)
             print "Agent: " + str(self.agents[0])
-            if count == 50:
+            if count == 90:
                 agent = self.QLearningAgent
                 if ("registerInitialState" in dir(agent)):
                     self.mute(0)
@@ -652,6 +652,11 @@ class Game:
                 ## TODO: could this exceed the total time
                 self.unmute()
                 self.agents[0] = self.QLearningAgent
+                print "--------------"
+                print self.display.isGodMode
+                self.display.isGodMode = True
+                print "////////////"
+                print self.display.isGodMode
             #print "@@@@@@@@@@@@@@@"
             #print self.state.data
             # Fetch the next agent
