@@ -322,6 +322,8 @@ class PacmanGraphics:
                 self.frameTime = 0.1
         if self.isGodMode:
             changeColor(image, PACMAN_COLOR2)
+        else:
+            changeColor(image, PACMAN_COLOR)
         if self.frameTime > 0.01 or self.frameTime < 0:
             start = time.time()
             fx, fy = self.getPosition(prevPacman)

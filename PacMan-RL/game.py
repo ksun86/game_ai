@@ -625,7 +625,7 @@ class Game:
         while not self.gameOver:
             print "Count: " + str(count)
             print "Agent: " + str(self.agents[0])
-            if count == 90:
+            if count == 50:
                 agent = self.QLearningAgent
                 if ("registerInitialState" in dir(agent)):
                     self.mute(0)
@@ -655,6 +655,39 @@ class Game:
                 print "--------------"
                 print self.display.isGodMode
                 self.display.isGodMode = True
+                print "////////////"
+                print self.display.isGodMode
+
+            if count == 200:
+                agent = self.keyboardPacman
+                if ("registerInitialState" in dir(agent)):
+                    self.mute(0)
+                    if self.catchExceptions:
+                        try:
+                            timed_func = TimeoutFunction(agent.registerInitialState, int(self.rules.getMaxStartupTime(0)))
+                            try:
+                                start_time = time.time()
+                                timed_func(self.state.deepCopy())
+                                time_taken = time.time() - start_time
+                                self.totalAgentTimes[0] += time_taken
+                            except TimeoutFunctionException:
+                                print >>sys.stderr, "Agent %d ran out of time on startup!" % i
+                                self.unmute()
+                                self.agentTimeout = True
+                                self._agentCrash(0, quiet=True)
+                                return
+                        except Exception,data:
+                            self._agentCrash(0, quiet=False)
+                            self.unmute()
+                            return
+                    else:
+                        agent.registerInitialState(self.state.deepCopy())
+                ## TODO: could this exceed the total time
+                self.unmute()
+                self.agents[0] = self.keyboardPacman
+                print "--------------"
+                print self.display.isGodMode
+                self.display.isGodMode = False
                 print "////////////"
                 print self.display.isGodMode
             #print "@@@@@@@@@@@@@@@"
