@@ -179,7 +179,22 @@ class ApproximateQAgent(PacmanQAgent):
     def __init__(self, extractor='IdentityExtractor', **args):
         self.featExtractor = util.lookup(extractor, globals())()
         PacmanQAgent.__init__(self, **args)
-        self.weights = util.Counter()
+        #self.weights = util.Counter()
+        fname1 = ('weights')
+        f1 = file(fname1, 'r')
+        print("init")
+        try: 
+            recorded1 = cPickle.load(f1)
+            print "-----++++++++++----"
+            print recorded1
+            self.weights = recorded1
+        
+        except:
+            print("exception")
+            self.weights = util.Counter()
+        
+        finally: 
+            f1.close()
 
     def getWeights(self):
         return self.weights
