@@ -281,6 +281,11 @@ class ClassicGameRules:
         self.quiet = quiet
         return game
 
+    def createKeyboardPacman(self, keyboardPacman):
+        print("creating")
+        print(keyboardPacman)
+        game.keyboardPacman = keyboardPacman
+
     def process(self, state, game):
         """
         Checks to see whether it is time to end the game.
@@ -538,13 +543,31 @@ def readCommand( argv ):
 
     # Choose a Pacman agent
     noKeyboard = options.gameToReplay == None and (options.textGraphics or options.quietGraphics)
+    
     pacmanType = loadAgent(options.pacman, noKeyboard)
     agentOpts = parseAgentArgs(options.agentArgs)
     if options.numTraining > 0:
         args['numTraining'] = options.numTraining
         if 'numTraining' not in agentOpts: agentOpts['numTraining'] = options.numTraining
+    
     pacman = pacmanType(**agentOpts) # Instantiate Pacman with agentArgs
     args['pacman'] = pacman
+    
+    #print(noKeyboard)
+    #print(agentOpts)
+    #print(options.pacman)
+    keyboardPacmanType = loadAgent('KeyboardAgent', False)
+    #print(keyboardPacmanType)
+    keyboardPacmanAgentOpts = {}
+    keyboardPacman = keyboardPacmanType()
+    args['keyboardPacman'] = keyboardPacman
+    print "keyboard pacman"
+    print keyboardPacman
+
+    # pacmanType2 = loadAgent('KeyboardAgent', False)
+    # pacman2 = pacmanType({})
+    # args['pacman2'] = pacman2
+
 
     # Don't display training games
     if 'numTrain' in agentOpts:
@@ -625,7 +648,7 @@ def replayGame( layout, actions, display ):
 
     display.finish()
 
-def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0, catchExceptions=False, timeout=30 ):
+def runGames( layout, pacman, keyboardPacman, ghosts, display, numGames, record, numTraining = 0, catchExceptions=False, timeout=30 ):
     import __main__
     __main__.__dict__['_display'] = display
 
@@ -640,9 +663,14 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
             gameDisplay = textDisplay.NullGraphics()
             rules.quiet = True
         else:
+            #testing
+            print("testing on game")
             gameDisplay = display
             rules.quiet = False
+        
         game = rules.newGame( layout, pacman, ghosts, gameDisplay, beQuiet, catchExceptions)
+        #rules.createKeyboardPacman(keyboardPacman)
+        game.keyboardPacman = keyboardPacman
         game.run()
         if not beQuiet: games.append(game)
 

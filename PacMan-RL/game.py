@@ -530,6 +530,7 @@ class Game:
         self.agentTimeout = False
         import cStringIO
         self.agentOutput = [cStringIO.StringIO() for agent in agents]
+        self.keyboardPacman = None
 
     def getProgress(self):
         if self.gameOver:
@@ -569,10 +570,20 @@ class Game:
         Main control loop for game play.
         """
         self.display.initialize(self.state.data)
+        #print "-------"
+        #print self.state.data
         self.numMoves = 0
 
         ###self.display.initialize(self.state.makeObservation(1).data)
         # inform learning agents of the game start
+       
+        #self.agents.append(self.keyboardPacman)
+        #self.agents[0] = self.keyboardPacman
+        # print(self.agents[0])
+        # print(self.keyboardPacman)
+        self.QLearningAgent = self.agents[0]
+        self.agents[0] = self.keyboardPacman
+        count = 0
         for i in range(len(self.agents)):
             agent = self.agents[i]
             if not agent:
@@ -612,6 +623,37 @@ class Game:
         numAgents = len( self.agents )
 
         while not self.gameOver:
+            print "Count: " + str(count)
+            print "Agent: " + str(self.agents[0])
+            if count == 50:
+                agent = self.QLearningAgent
+                if ("registerInitialState" in dir(agent)):
+                    self.mute(0)
+                    if self.catchExceptions:
+                        try:
+                            timed_func = TimeoutFunction(agent.registerInitialState, int(self.rules.getMaxStartupTime(0)))
+                            try:
+                                start_time = time.time()
+                                timed_func(self.state.deepCopy())
+                                time_taken = time.time() - start_time
+                                self.totalAgentTimes[0] += time_taken
+                            except TimeoutFunctionException:
+                                print >>sys.stderr, "Agent %d ran out of time on startup!" % i
+                                self.unmute()
+                                self.agentTimeout = True
+                                self._agentCrash(0, quiet=True)
+                                return
+                        except Exception,data:
+                            self._agentCrash(0, quiet=False)
+                            self.unmute()
+                            return
+                    else:
+                        agent.registerInitialState(self.state.deepCopy())
+                ## TODO: could this exceed the total time
+                self.unmute()
+                self.agents[0] = self.QLearningAgent
+            #print "@@@@@@@@@@@@@@@"
+            #print self.state.data
             # Fetch the next agent
             agent = self.agents[agentIndex]
             move_time = 0
@@ -713,6 +755,8 @@ class Game:
 
             if _BOINC_ENABLED:
                 boinc.set_fraction_done(self.getProgress())
+
+            count += 1
 
         # inform a learning agent of the game result
         for agentIndex, agent in enumerate(self.agents):
