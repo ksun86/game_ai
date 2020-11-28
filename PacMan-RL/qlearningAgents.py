@@ -237,3 +237,53 @@ class ApproximateQAgent(PacmanQAgent):
             print('Weights at the end of the game play')
             print(self.weights)
             pass
+
+class GTApproximateQAgent(ApproximateQAgent):
+    """
+       GTApproximateQLearningAgent
+    """
+    def __init__(self, extractor='IdentityExtractor', **args):
+        self.featExtractor = util.lookup(extractor, globals())()
+        PacmanQAgent.__init__(self, **args)
+        try: 
+            fname1 = ('gtweights')
+            f1 = file(fname1, 'r')
+            print("init")
+            recorded1 = cPickle.load(f1)
+            print "-----++++++++++----"
+            print recorded1
+            self.weights = recorded1
+            f1.close()
+        except:
+            print("exception")
+            self.weights = util.Counter()
+            
+
+    def getWeights(self):
+        return self.weights
+
+    def getQValue(self, state, action):
+        """
+          Should return Q(state,action) = w * featureVector
+          where * is the dotProduct operator
+        """
+        feats = self.featExtractor.getFeatures(state, action)
+        qval = sum(feats[f] * self.weights[f] for f in feats)
+        return qval
+
+    def update(self, state, action, nextState, reward):
+        """
+           Should update your weights based on transition
+        """
+        feats = self.featExtractor.getFeatures(state, action)
+        diff = reward + self.discount * self.getValue(nextState) - self.getQValue(state, action)
+        for f in feats:
+            self.weights[f] += self.alpha * diff * feats[f]
+        return
+
+    def final(self, state):
+        PacmanQAgent.final(self, state)
+        if self.episodesSoFar == self.numTraining:
+            print('Weights at the end of the game play')
+            print(self.weights)
+            pass

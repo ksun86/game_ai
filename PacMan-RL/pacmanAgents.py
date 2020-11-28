@@ -18,7 +18,7 @@ import random
 import game
 import util
 
-class LeftTurnAgent(game.Agent):
+class leftTurnAgent(game.Agent):
     "An agent that turns left at every opportunity"
 
     def getAction(self, state):
@@ -32,7 +32,21 @@ class LeftTurnAgent(game.Agent):
         if Directions.LEFT[left] in legal: return Directions.LEFT[left]
         return Directions.STOP
 
-class GreedyAgent(Agent):
+class gtRightTurnAgent(game.Agent):
+    "An agent that turns right at every opportunity"
+
+    def getAction(self, state):
+        legal = state.getLegalPacmanActions()
+        current = state.getPacmanState().configuration.direction
+        if current == Directions.STOP: current = Directions.NORTH
+        right = Directions.RIGHT[current]
+        if right in legal: return right
+        if current in legal: return current
+        if Directions.LEFT[current] in legal: return Directions.LEFT[current]
+        if Directions.RIGHT[right] in legal: return Directions.RIGHT[right]
+        return Directions.STOP
+
+class defaultGreedyAgent(Agent):
     def __init__(self, evalFn="scoreEvaluation"):
         self.evaluationFunction = util.lookup(evalFn, globals())
         assert self.evaluationFunction != None
@@ -47,6 +61,22 @@ class GreedyAgent(Agent):
         bestScore = max(scored)[0]
         bestActions = [pair[1] for pair in scored if pair[0] == bestScore]
         return random.choice(bestActions)
+
+class gtGreedyAgent(Agent):
+    def __init__(self, evalFn="scoreEvaluation"):
+        self.evaluationFunction = util.lookup(evalFn, globals())
+        assert self.evaluationFunction != None
+
+    def getAction(self, state):
+        # Generate candidate actions
+        actions = state.getLegalPacmanActions()
+        if Directions.STOP in actions: actions.remove(Directions.STOP)
+
+        successors = [(state.generateSuccessor(0, action), action) for action in actions]
+        scored = [(self.evaluationFunction(state), action) for state, action in successors]
+        bestScore = max(scored)[0]
+        bestActions = [pair[1] for pair in scored if pair[0] == bestScore]
+        return bestActions[0]
 
 def scoreEvaluation(state):
     return state.getScore()

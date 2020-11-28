@@ -621,11 +621,14 @@ class Game:
 
         agentIndex = self.startingIndex
         numAgents = len( self.agents )
-
+        removed = 1
         while not self.gameOver:
+            from graphicsUtils import keys_pressed
+            from graphicsUtils import keys_waiting
+            keys = keys_waiting() + keys_pressed()
             print "Count: " + str(count)
             print "Agent: " + str(self.agents[0])
-            if count == 50:
+            if 'g' in keys:
                 agent = self.QLearningAgent
                 if ("registerInitialState" in dir(agent)):
                     self.mute(0)
@@ -650,6 +653,8 @@ class Game:
                     else:
                         agent.registerInitialState(self.state.deepCopy())
                 ## TODO: could this exceed the total time
+                if 'h' in keys:
+                    keys.remove('h')
                 self.unmute()
                 self.agents[0] = self.QLearningAgent
                 print "--------------"
@@ -658,7 +663,7 @@ class Game:
                 print "////////////"
                 print self.display.isGodMode
 
-            if count == 200:
+            if 'h' in keys:
                 agent = self.keyboardPacman
                 if ("registerInitialState" in dir(agent)):
                     self.mute(0)
@@ -683,6 +688,8 @@ class Game:
                     else:
                         agent.registerInitialState(self.state.deepCopy())
                 ## TODO: could this exceed the total time
+                if 'g' in keys:
+                    keys.remove('g')
                 self.unmute()
                 self.agents[0] = self.keyboardPacman
                 print "--------------"
@@ -693,6 +700,7 @@ class Game:
             #print "@@@@@@@@@@@@@@@"
             #print self.state.data
             # Fetch the next agent
+
             agent = self.agents[agentIndex]
             move_time = 0
             skip_action = False
