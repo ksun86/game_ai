@@ -16,7 +16,7 @@ from game import *
 from learningAgents import ReinforcementAgent
 from featureExtractors import *
 
-import random,util,math
+import random,util,math,cPickle
 
 class QLearningAgent(ReinforcementAgent):
     """
@@ -232,7 +232,7 @@ class GTApproximateQAgent(PacmanQAgent):
         self.featExtractor = util.lookup(extractor, globals())()
         PacmanQAgent.__init__(self,gamma=0.9,alpha=0.9,numTraining=1000, **args)
         try: 
-            fname1 = ('gtweights')
+            fname1 = ('weights')
             f1 = file(fname1, 'r')
             print("init")
             recorded1 = cPickle.load(f1)
