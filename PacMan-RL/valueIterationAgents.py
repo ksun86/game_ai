@@ -46,20 +46,21 @@ class ValueIterationAgent(ValueEstimationAgent):
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
         states = self.mdp.getStates()
-        actions = [None]* len(mdp.getStates())
+        actions = [None]* len(states)
         self.moves = dict(zip(states, actions))
 
         for iteration in range(self.iterations):
             new_values = util.Counter()
             tstates = self.mdp.getStates()
             for tstate in tstates:
-                high = -10000000000
-                for move in self.mdp.getPossibleActions(tstate):
-                    quality = self.computeQValueFromValues(tstate, move)
-                    if quality > high:
-                        high = quality
-                        self.moves[tstate] = move
-                        new_values[tstate] = quality
+                maxValue = -100000000
+                possibleActions = self.mdp.getPossibleActions(tstate)
+                for i in range(len(possibleActions)):
+                  qValue = self.computeQValueFromValues(tstate, possibleActions[i])
+                  if qValue > maxValue:
+                      maxValue = qValue
+                      self.moves[tstate] = possibleActions[i]
+                      new_values[tstate] = qValue
                     # endif
             # endfor
             self.values = new_values
@@ -99,8 +100,7 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
-        action = self.moves[state]
-        return action
+        return self.moves[state]
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
